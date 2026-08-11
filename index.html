@@ -39,42 +39,31 @@
   .blob{
     position:fixed;
     border-radius:50%;
-    filter:blur(90px);
+    filter:blur(70px);
     z-index:0;
     pointer-events:none;
-    opacity:0.35;
+    opacity:0.28;
     will-change:transform;
   }
   .blob-1{
-    width:520px; height:520px;
+    width:420px; height:420px;
     background:radial-gradient(circle, var(--accent), transparent 70%);
-    top:-160px; left:-120px;
-    animation:blob-float-1 22s ease-in-out infinite;
+    top:-140px; left:-100px;
+    animation:blob-float-1 28s ease-in-out infinite;
   }
   .blob-2{
-    width:460px; height:460px;
-    background:radial-gradient(circle, var(--amber), transparent 70%);
-    bottom:-140px; right:-100px;
-    animation:blob-float-2 26s ease-in-out infinite;
-  }
-  .blob-3{
     width:380px; height:380px;
-    background:radial-gradient(circle, #4a9de8, transparent 70%);
-    top:40%; left:50%;
-    animation:blob-float-3 30s ease-in-out infinite;
-    opacity:0.18;
+    background:radial-gradient(circle, var(--amber), transparent 70%);
+    bottom:-120px; right:-90px;
+    animation:blob-float-2 32s ease-in-out infinite;
   }
   @keyframes blob-float-1{
-    0%,100%{ transform:translate(0,0) scale(1); }
-    50%{ transform:translate(60px,80px) scale(1.15); }
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(40px,50px); }
   }
   @keyframes blob-float-2{
-    0%,100%{ transform:translate(0,0) scale(1); }
-    50%{ transform:translate(-70px,-50px) scale(1.1); }
-  }
-  @keyframes blob-float-3{
-    0%,100%{ transform:translate(-50%,-50%) scale(1); }
-    50%{ transform:translate(-50%,-50%) translate(40px,-60px) scale(1.2); }
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-40px,-30px); }
   }
 
   ::selection{ background:var(--accent); color:#0a0e0e; }
@@ -187,8 +176,7 @@
   .tag{
     font-size:12px;
     border:1px solid rgba(255,255,255,0.08);
-    background:rgba(255,255,255,0.02);
-    backdrop-filter:blur(6px);
+    background:rgba(255,255,255,0.045);
     color:var(--text-dim);
     padding:5px 10px;
     border-radius:5px;
@@ -205,8 +193,7 @@
     padding:10px 18px;
     border-radius:7px;
     border:1px solid rgba(255,255,255,0.08);
-    background:rgba(255,255,255,0.02);
-    backdrop-filter:blur(6px);
+    background:rgba(255,255,255,0.045);
     text-decoration:none;
     transition:border-color .15s ease, background .15s ease, transform .15s ease, box-shadow .2s ease;
   }
@@ -249,9 +236,7 @@
   }
   .stack-item{
     border:1px solid rgba(255,255,255,0.08);
-    background:rgba(255,255,255,0.02);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
+    background:rgba(255,255,255,0.045);
     border-radius:8px;
     padding:10px 12px;
     font-size:13px;
@@ -267,9 +252,7 @@
   /* Projects — glass cards */
   .project{
     border:1px solid rgba(255,255,255,0.08);
-    background:rgba(255,255,255,0.02);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
+    background:rgba(255,255,255,0.045);
     border-radius:10px;
     padding:20px 22px;
     margin-bottom:16px;
@@ -392,11 +375,10 @@
 
     footer{ flex-direction:column; text-align:center; }
 
-    /* keep animation but shrink so mobile GPUs aren't pushed as hard */
-    .blob{ filter:blur(60px); opacity:0.25; }
-    .blob-1{ width:320px; height:320px; }
-    .blob-2{ width:300px; height:300px; }
-    .blob-3{ width:240px; height:240px; }
+    /* mobile blobs: smaller + lighter blur, GPU cost matters most here */
+    .blob{ filter:blur(45px); opacity:0.18; }
+    .blob-1{ width:260px; height:260px; }
+    .blob-2{ width:240px; height:240px; }
   }
 
   @media (max-width:400px){
@@ -405,17 +387,12 @@
     .term-title{ display:none; } /* no room next to the dots on very small screens */
   }
 
-  @media (max-width:640px) and (prefers-reduced-motion: no-preference){
-    /* backdrop-filter blur is the heaviest cost on low-end phones; trim it, don't drop it */
-    .term{ backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); }
-    .project, .stack-item{ backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  @media (max-width:640px){
+    /* backdrop-filter blur is the heaviest cost on low-end phones; trim main panel further */
+    .term{ backdrop-filter:blur(10px) saturate(130%); -webkit-backdrop-filter:blur(10px) saturate(130%); }
   }
 
   /* ---- Animation layer ---- */
-  #bg-canvas{
-    position:fixed; inset:0; z-index:0;
-    opacity:0.55;
-  }
   .wrap{ position:relative; z-index:1; }
 
   .term{
@@ -504,7 +481,6 @@
   @media (prefers-reduced-motion: reduce){
     .reveal{ opacity:1; transform:none; transition:none; }
     .term{ animation:none; }
-    #bg-canvas{ display:none; }
     .blob{ animation:none; }
   }
 </style>
@@ -512,8 +488,6 @@
 <body>
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
-<canvas id="bg-canvas"></canvas>
 <div class="scanlines"></div>
 
 <div class="wrap">
@@ -827,42 +801,6 @@
       btn.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
     });
   });
-
-  // ---- Subtle animated dot-grid background ----
-  var canvas = document.getElementById('bg-canvas');
-  var ctx = canvas.getContext('2d');
-  var w, h, dots = [];
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  function resize(){
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    var spacing = window.innerWidth < 640 ? 64 : 42;
-    dots = [];
-    for(var x = spacing/2; x < w; x += spacing){
-      for(var y = spacing/2; y < h; y += spacing){
-        dots.push({ x: x, y: y, baseY: y, phase: Math.random() * Math.PI * 2 });
-      }
-    }
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  var t = 0;
-  function draw(){
-    if(reduceMotion) return;
-    ctx.clearRect(0, 0, w, h);
-    t += 0.006;
-    for(var k = 0; k < dots.length; k++){
-      var d = dots[k];
-      var yOff = Math.sin(t + d.phase) * 3;
-      var alpha = 0.06 + 0.05 * (Math.sin(t + d.phase) * 0.5 + 0.5);
-      ctx.fillStyle = 'rgba(95,217,122,' + alpha.toFixed(3) + ')';
-      ctx.fillRect(d.x, d.baseY + yOff, 1.4, 1.4);
-    }
-    requestAnimationFrame(draw);
-  }
-  if(!reduceMotion) draw();
 })();
 </script>
 
